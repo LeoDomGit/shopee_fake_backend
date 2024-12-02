@@ -23,11 +23,15 @@ class UserController extends Controller
     /**
      * Show the form for creating a new resource.
      */
-    public function create()
+    public function logout_seller()
     {
-        //
+        $user = Auth::guard('sanctum')->user();
+        if ($user) {
+            $user->tokens()->delete();
+            return response()->json(['success' => true, 'message' => 'Seller logged out successfully.']);
+        }
+        return response()->json(['success' => false, 'message' => 'No authenticated user found.'], 401);
     }
-
     /**
      * Store a newly created resource in storage.
      */
@@ -84,7 +88,25 @@ class UserController extends Controller
         }
         return response()->json(['check'=>false,'msg'=>'Sai email hoặc mật khẩu']);
     }
-
+    /**
+     * Show the form for editing the specified resource.
+     */
+    public function update_seller(Request $request){
+        $validator = Validator::make($request->all(), [
+            'email' => 'nullable|email|unique:users,email',
+            'password'=>'nullable',
+        ]);
+        if ($validator->fails()) {
+            return response()->json(['check' => false, 'msg' => $validator->errors()->first()]);
+        }
+        $data=$request->all();
+        if($request->has('password')){
+            $data['password']=Hash::make($request->password);
+        }
+        $data['updated_at']= now();
+        User::where('id',Auth::id())->update($data);
+        return response()->json(['check'=>true]);
+    }
     /**
      * Show the form for editing the specified resource.
      */

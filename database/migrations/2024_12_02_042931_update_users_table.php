@@ -11,7 +11,7 @@ return new class extends Migration
      */
     public function up(): void
     {
-        if (Schema::hasTable('users')) {
+        if (Schema::hasTable('users') && !Schema::hasColumn('users', 'status')) {
             Schema::table('users', function (Blueprint $table) {
                 $table->boolean('status')->after('email')->default(1);
             });
