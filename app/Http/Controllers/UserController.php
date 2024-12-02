@@ -2,9 +2,13 @@
 
 namespace App\Http\Controllers;
 
+use App\Mail\createUser;
+use App\Models\Roles;
 use App\Models\User;
 use Illuminate\Http\Request;
-
+use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Facades\Validator;
 class UserController extends Controller
 {
     /**
@@ -26,9 +30,31 @@ class UserController extends Controller
     /**
      * Store a newly created resource in storage.
      */
-    public function store(Request $request)
+    public function store_seller(Request $request)
     {
-        //
+        $validator = Validator::make($request->all(), [
+            'name' => 'required',
+            'email' => 'required|email|unique:users,email',
+        ]);
+        if ($validator->fails()) {
+            return response()->json(['check' => false, 'msg' => $validator->errors()->first()]);
+        }
+        $data = $request->all();
+        $password = random_int(10000, 99999);
+        $data['password'] = Hash::make($password);
+        $role = Roles::where('name', 'like', '%Sellers%')->first();
+        if(!$role){
+            return response()->json(['check'=>false,'msg'=>'Role not found']);
+        }
+        $data['role_id'] = $role ? $role->value('id') : null;
+        User::create($data);
+        $data = [
+            'name' => $request->name,
+            'email' => $request->email,
+            'password' => $password,
+        ];
+        Mail::to($request->email)->send(new createUser($data));
+        return response()->json(['check'=>true]);
     }
 
     /**
