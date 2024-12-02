@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Roles;
 use App\Http\Requests\RoleRequest;
 use App\Traits\HasCrud;
+use Illuminate\Http\Request;
 use Inertia\Inertia;
 
 class RolesController extends Controller
@@ -27,5 +28,10 @@ class RolesController extends Controller
         $this->model::find($id)->update($data);
         $data=$this->model::all();
         return response()->json(['check'=>true,'data'=>$data]);
+    }
+
+    public function index_api(Request $request){
+        $result =$this->model::all();
+        return response()->json($result);   
     }
 }
