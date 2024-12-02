@@ -6,6 +6,7 @@ use App\Mail\createUser;
 use App\Models\Roles;
 use App\Models\User;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Validator;
@@ -43,10 +44,11 @@ class UserController extends Controller
         $password = random_int(10000, 99999);
         $data['password'] = Hash::make($password);
         $role = Roles::where('name', 'like', '%Sellers%')->first();
+
         if(!$role){
             return response()->json(['check'=>false,'msg'=>'Role not found']);
         }
-        $data['role_id'] = $role ? $role->value('id') : null;
+        $data['role_id'] = $role ?$role->id : null;
         User::create($data);
         $data = [
             'name' => $request->name,
@@ -60,9 +62,27 @@ class UserController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show(User $user)
+    public function login_sellers(Request $request,User $user)
     {
-        //
+        $validator = Validator::make($request->all(), [
+            'email' => 'required|email|exists:users,email',
+            'password'=>'required',
+        ]);
+        if ($validator->fails()) {
+            return response()->json(['check' => false, 'msg' => $validator->errors()->first()]);
+        }
+        if(Auth::attempt(['email' => $request->email, 'password' => $request->password,'status'=>1],true)){
+            $user=User::where('email',$request->email)->first();
+            $token = $user->createToken('customer_token')->plainTextToken;
+            $user->update([
+                'remember_token' => $token,
+            ]);
+            return response()->json([
+                'message' => 'Login successful',
+                'token' => $token,
+            ]);
+        }
+        return response()->json(['check'=>false,'msg'=>'Sai email hoặc mật khẩu']);
     }
 
     /**

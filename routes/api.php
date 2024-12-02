@@ -22,4 +22,6 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
 
 Route::get('/roles',[RolesController::class,'index_api']);
 Route::post('/create_seller',[UserController::class,'store_seller']);
+//===================
+Route::post('/login_seller',[UserController::class, 'login_sellers']);
 
