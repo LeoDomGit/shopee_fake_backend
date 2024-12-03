@@ -108,33 +108,24 @@ class BrandsController extends Controller
         if ($validator->fails()) {
             return response()->json(['check' => false, 'msg' => $validator->errors()->first()]);
         }
-
-        // Find the brand by ID
         $brand = Brands::find($id);
 
         if (!$brand) {
             return response()->json(['check' => false, 'msg' => 'Brand not found.']);
         }
-
         $userId = Auth::id();
         $shopId = Shops::where('seller_id', $userId)->value('id');
 
         if (!$shopId) {
             return response()->json(['check' => false, 'msg' => 'Shop not found for the seller.']);
         }
-
-        // Check if the brand belongs to the correct shop
         if ($brand->shop_id != $shopId) {
             return response()->json(['check' => false, 'msg' => 'You do not have permission to update this brand.']);
         }
-
-        // Update name and slug if a new name is provided
         if ($request->has('name')) {
             $brand->name = $request->name;
             $brand->slug = Str::slug($request->name);
         }
-
-        // Update other fields as necessary
         $brand->updated_at = now();
         $data=$request->all();
         $data['updated_at'] = now();
@@ -148,12 +139,8 @@ class BrandsController extends Controller
                 ]);
                 return $tag;
             });
-
-            // Sync new tags with the brand (removes old ones and adds new)
             $brand->tags()->sync($tags->pluck('id')->toArray());
         }
-
-        // Fetch updated brand data with tags
         $data = Brands::with('tags')->where('shop_id', $shopId)->get();
 
         return response()->json(['check' => true, 'data' => $data]);
