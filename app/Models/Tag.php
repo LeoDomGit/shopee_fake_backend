@@ -14,4 +14,14 @@ class Tag extends Model
     {
         return $this->morphedByMany(Brands::class, 'taggable');
     }
+
+    public function categories()
+    {
+        return $this->belongsToMany(Categories::class, 'category_tag');
+    }
+    public function taggables()
+    {
+        return $this->morphedByMany(Brands::class, 'taggable');
+        return $this->morphedByMany(Categories::class, 'taggable');
+    }
 }

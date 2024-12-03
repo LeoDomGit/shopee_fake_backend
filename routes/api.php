@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\BrandsController;
+use App\Http\Controllers\CategoriesController;
 use App\Http\Controllers\RolesController;
 use App\Http\Controllers\ShopsController;
 use App\Http\Controllers\UserController;
@@ -33,5 +34,6 @@ Route::middleware(['auth:sanctum'])->group(function () {
     Route::post('shop/{id}',[ShopsController::class,'update']);
     Route::get('/logout_seller',[UserController::class, 'logout_seller']);
     Route::resource('brands',BrandsController::class);
+    Route::resource('categories',CategoriesController::class);
 });
 
