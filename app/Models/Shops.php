@@ -22,4 +22,8 @@ class Shops extends Model
         'created_at',
         'updated_at'
     ];
+    public function seller()
+    {
+        return $this->belongsTo(User::class, 'seller_id', 'id');
+    }
 }
