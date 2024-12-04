@@ -19,7 +19,6 @@ return new class extends Migration
                 $table->foreign('brand_id')->references('id')->on('brands');
                 $table->foreign('category_id')->references('id')->on('categories');
                 $table->foreign('shop_id')->references('id')->on('shops');
-
             });
         }
     }
