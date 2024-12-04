@@ -23,5 +23,7 @@ class Tag extends Model
     {
         return $this->morphedByMany(Brands::class, 'taggable');
         return $this->morphedByMany(Categories::class, 'taggable');
+        return $this->morphedByMany(Categories::class, 'taggable');
+
     }
 }
